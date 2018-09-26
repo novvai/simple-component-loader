@@ -9,11 +9,18 @@ class Component{
         this.componentVariables = {};
         this.container = e('[data-bi-location="app"]')
     }
-
+    /**
+     * Set custom container if needed
+     * 
+     * @param {string} location 
+     */
     setContainer(location){
         this.container = e(`[data-bi-location="${location}"]`);
     }
 
+    /**
+     * Start Execution of the load script
+     */
     make() {
         return this.renderContent();
     }
@@ -30,6 +37,9 @@ class Component{
         })
     }
 
+    /**
+     * Replace all single level template variables and create HTML nodes
+     */
     makeFromTemplate() {
         for (const key in this.componentVariables) {
             this.template = this.template.replace(`@|${key}|@`, this.componentVariables[key]);
@@ -38,6 +48,11 @@ class Component{
 
     }
 
+    /**
+     * Find elements that are placeholders for iteratable object
+     * use the placeholder as template, iterate through all values and fill that template with different values
+     * lastly append to the parent object and pass to the template
+     */
     iterateTemplate(){
         let iteratebleElements = findIn(this.template, '[data-bi-for]');
         if(iteratebleElements === null){
@@ -71,6 +86,14 @@ class Component{
         })
     }
 
+    /**
+     * Attach custom behaviour to  elements givin flexability of work
+     * Find all elements with data attribute [data-bi-trigger]
+     * attach to the element method specified under data-bi-trigger
+     * 
+     * example : div data-bi-trigger="load"
+     * will attach to that div click listener with callback method *load*
+     */
     attachHandlers() {
         let handlerElements = findIn(this.container, '[data-bi-trigger]');
 
@@ -92,8 +115,12 @@ class Component{
         });
     }
 
+    /**
+     * Clears the content for the container and fills the container with new data
+     */
     addToContainer(){
-        this.container.innerHtml = "";
+        this.container.innerHTML = "";
+
         this.template.childNodes.forEach(node=>{
             this.container.appendChild(node);
         })
