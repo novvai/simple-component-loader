@@ -1,20 +1,21 @@
-import {NvComponentLoader} from "./simple-component-loader"
-import { e,findIn, createElement } from "./helpers";
+import { NvComponentLoader } from "./simple-component-loader"
+import { e, findIn, createElement } from "./helpers";
 
-class Component{
- 
+class Component {
+
     constructor() {
         this.component = new NvComponentLoader();
         this.template = "";
         this.componentVariables = {};
         this.container = e('[data-bi-location="app"]')
+        this.setupObserver();
     }
     /**
      * Set custom container if needed
      * 
      * @param {string} location 
      */
-    setContainer(location){
+    setContainer(location) {
         this.container = e(`[data-bi-location="${location}"]`);
     }
 
@@ -26,7 +27,19 @@ class Component{
     }
 
     /** PRIVATE */
-   
+    loaded(){
+       // Attach custom event handler
+    }
+    /** 
+     * 
+     */
+    setupObserver(){
+        this.observer = new MutationObserver((mutation,observer)=>{
+            this.loaded();
+            this.observer.disconnect();
+        })
+    }
+
     renderContent() {
         this.component.load(this.template).then((result) => {
             this.template = result;
@@ -36,7 +49,7 @@ class Component{
             this.attachHandlers();
         })
     }
-
+    
     /**
      * Replace all single level template variables and create HTML nodes
      */
@@ -53,36 +66,36 @@ class Component{
      * use the placeholder as template, iterate through all values and fill that template with different values
      * lastly append to the parent object and pass to the template
      */
-    iterateTemplate(){
+    iterateTemplate() {
         let iteratebleElements = findIn(this.template, '[data-bi-for]');
-        if(iteratebleElements === null){
+        if (iteratebleElements === null) {
             return;
         }
-        if(iteratebleElements.length == undefined){
+        if (iteratebleElements.length == undefined) {
             iteratebleElements = [iteratebleElements];
         }
-        iteratebleElements.forEach(e=>{
+        iteratebleElements.forEach(e => {
             let tmp = document.createElement("div");
-            
+
             let parent = e.parentNode;
-            
+
             tmp.appendChild(e);
 
             let cp = tmp.firstChild.innerHTML;
-            try{
-                this.componentVariables[e.getAttribute('data-bi-for')].forEach(el=>{
-                
+            try {
+                this.componentVariables[e.getAttribute('data-bi-for')].forEach(el => {
+
                     let component = cp;
                     for (const key in el) {
                         component = component.replace(`@|${key}|@`, el[key]);
                     }
-    
+
                     parent.appendChild(createElement(component).firstChild);
                 });
-            }catch(er){
+            } catch (er) {
                 console.error(`Template variable has been specified, but no Component variable is provided : ${e.getAttribute('data-bi-for')}`)
             }
-           
+
         })
     }
 
@@ -97,19 +110,19 @@ class Component{
     attachHandlers() {
         let handlerElements = findIn(this.container, '[data-bi-trigger]');
 
-        if(handlerElements === null){
+        if (handlerElements === null) {
             return;
         }
 
-        if (handlerElements.length === undefined){
+        if (handlerElements.length === undefined) {
             handlerElements = [handlerElements];
         }
 
         handlerElements.forEach(handler => {
             const handlerMethod = handler.getAttribute('data-bi-trigger');
-            try{
+            try {
                 handler.addEventListener('click', this[handlerMethod].bind(this));
-            }catch(e){
+            } catch (e) {
                 console.error(`The method "${handlerMethod}" that you try to invoke does not exist, you can add such behaviour using .addHandler(handlerName, callback)`);
             }
         });
@@ -118,10 +131,11 @@ class Component{
     /**
      * Clears the content for the container and fills the container with new data
      */
-    addToContainer(){
+    addToContainer() {
+        this.observer.observe(this.container, {childList: true});
         this.container.innerHTML = "";
 
-        this.template.childNodes.forEach(node=>{
+        this.template.childNodes.forEach(node => {
             this.container.appendChild(node);
         })
     }

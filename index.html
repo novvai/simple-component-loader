@@ -24,10 +24,13 @@
                     this.componentVariables = {
                         something: 'cool',
                         products: [
-                            // { Title: "Hey", description: "make some progress" },
-                            // { Title: "Hey 2", description: "hahahaah" },
+                            { Title: "Hey", description: "make some progress" },
+                            { Title: "Hey 2", description: "hahahaah" },
                         ]
                     }
+                }
+                loaded(){
+                    console.log(document.querySelectorAll('.pesho'));
                 }
                 handle() {
                     this.make();
