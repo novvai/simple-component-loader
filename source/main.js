@@ -5,6 +5,12 @@ class Component {
 
     constructor() {
         this.component = new NvComponentLoader();
+        this.meta = {
+            title: "",
+            description: "",
+            keywords: ""
+        };
+        this.metaSelectors = ['meta[name="keywords"]', 'title', 'meta[name="description"]'];
         this.template = "";
         this.componentVariables = {};
         this.container = e('[data-bi-location="app"]')
@@ -27,14 +33,18 @@ class Component {
     }
 
     /** PRIVATE */
-    loaded(){
-       // Attach custom event handler
-    }
-    /** 
-     * 
+    /**
+     * Callback when all element are loaded
      */
-    setupObserver(){
-        this.observer = new MutationObserver((mutation,observer)=>{
+    loaded() {
+        // Attach custom event handler
+    }
+
+    /** 
+     * Observer that will execute when all elements are rendered
+     */
+    setupObserver() {
+        this.observer = new MutationObserver((mutation, observer) => {
             this.loaded();
             this.observer.disconnect();
         })
@@ -45,11 +55,12 @@ class Component {
             this.template = result;
             this.makeFromTemplate();
             this.iterateTemplate();
+            this.addMeta()
             this.addToContainer();
             this.attachHandlers();
         })
     }
-    
+
     /**
      * Replace all single level template variables and create HTML nodes
      */
@@ -132,11 +143,45 @@ class Component {
      * Clears the content for the container and fills the container with new data
      */
     addToContainer() {
-        this.observer.observe(this.container, {childList: true});
+        this.observer.observe(this.container, { childList: true });
         this.container.innerHTML = "";
 
         this.template.childNodes.forEach(node => {
             this.container.appendChild(node);
+        })
+    }
+
+    /**
+     * Adds Selector
+     * 
+     * @param {String|null} selector 
+     */
+    appendMetaSelectors(selector = null){
+        if(selector == null || selector == undefined){
+            return this;
+        }
+
+        this.metaSelectors.push();
+        
+        return this;
+    }
+
+    /** 
+     * Add meta information if its given
+     */
+    addMeta() {
+        this.metaSelectors.forEach(metaTag => {
+            const elem = e(metaTag);
+            if(elem != null){
+                if(metaTag === 'title'){
+                    elem.innerHTML = (this.meta.hasOwnProperty(metaTag))?this.meta[metaTag]:"";
+                }else{
+                    const metaContent = this.meta[elem.getAttribute('name')]
+                    if(metaContent != null && metaContent != undefined){
+                        elem.setAttribute('content', metaContent);
+                    }
+                }
+            }
         })
     }
 }
