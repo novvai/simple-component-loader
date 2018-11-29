@@ -1,5 +1,11 @@
 
 export class NvComponentLoader{
+    /**
+     * Retrieve html template file from the server
+     * 
+     * @param {String} componentPath
+     * @return {Promise}
+     */
     load(componentPath) {
         this.normalize(componentPath);
         return new Promise((resolve,reject)=>{
@@ -14,6 +20,12 @@ export class NvComponentLoader{
         });
     }
 
+    /**
+     * Normalizes given path string
+     * 
+     * @param {String} path
+     * @return {void} 
+     */
     normalize(path) {
         this.componentPath = path;
         let p = this.componentPath.split('.');

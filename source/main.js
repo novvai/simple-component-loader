@@ -32,7 +32,7 @@ class Component {
         return this.renderContent();
     }
 
-    /** PRIVATE */
+    /** ABSTRACT */
     /**
      * Callback when all element are loaded
      */
@@ -40,6 +40,7 @@ class Component {
         // Attach custom event handler
     }
 
+    // PRIVATE
     /** 
      * Observer that will execute when all elements are rendered
      */
