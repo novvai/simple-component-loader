@@ -5,11 +5,11 @@ Easy to use Component loader for single page applications or just a template pre
 ## Usage
 Create Class that implements *Component*
 ```javascript
-	class ExampleComponent extends Component {
-    	constructor(){
+class ExampleComponent extends Component {
+     constructor(){
         ...
-        }
-    }
+     }
+}
 ```
 Constructor variables
 ```javascript
